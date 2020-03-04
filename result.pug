@@ -1,0 +1,25 @@
+style 
+  | table { border-collapse: collapse; }
+  |
+  | table, th, td {
+  |   border: 1px solid black; 
+  | }
+  |
+  | th, td { padding: 0.5em; }
+
+table
+  thead
+    tr
+      each header in headers
+        th #{header}
+  tbody
+    each row in result
+      tr
+        each column in row
+          td #{column}
+    tr
+        td
+        td
+        td
+        td 總和
+        td #{sum}
