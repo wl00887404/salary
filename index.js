@@ -1,12 +1,12 @@
 const { readFileSync, writeFileSync } = require("fs");
 const pug = require("pug");
 
-const readYaml = path =>
+const readYaml = (path) =>
   readFileSync(path, { encoding: "utf-8" })
     .split("\n")
-    .filter(x => x.trim())
-    .map(raw => new Date(raw))
-    .map(date => `2020-${date.getMonth() + 1}-${date.getDate()}`);
+    .filter((x) => x.trim())
+    .map((raw) => new Date(raw))
+    .map((date) => `2020-${date.getMonth() + 1}-${date.getDate()}`);
 
 // 1/4
 const hoursPerComment = 1 / 4;
@@ -19,7 +19,7 @@ const assignments = readYaml("./assignments.yaml");
 
 const commentsSet = new Set(comments);
 const assignmentsSet = new Set(assignments);
-const makeEvent = key => {
+const makeEvent = (key) => {
   const events = [];
 
   if (commentsSet.has(key)) events.push("回復問題");
@@ -30,12 +30,12 @@ const makeEvent = key => {
 
 const resultMap = new Map();
 
-comments.forEach(comment => {
+comments.forEach((comment) => {
   const value = resultMap.get(comment) || 0;
   resultMap.set(comment, value + hoursPerComment);
 });
 
-assignments.forEach(assignment => {
+assignments.forEach((assignment) => {
   const value = resultMap.get(assignment) || 0;
   resultMap.set(assignment, value + hoursPerAssignment);
 });
@@ -45,7 +45,7 @@ resultMap.forEach((value, key) => {
 });
 
 let sum = 0;
-resultMap.forEach(value => {
+resultMap.forEach((value) => {
   sum += value;
 });
 
@@ -54,26 +54,26 @@ const headers = [
   "學期",
   "Event / Support",
   "日期",
-  "時數(最小單位：0.25 小時)"
+  "時數(最小單位：0.25 小時)",
 ];
 
 const result = Array.from(resultMap)
   .sort(([key1], [key2]) => new Date(key1).getTime() - new Date(key2).getTime())
   .map(([key, value]) => ["振志", "INTRO", makeEvent(key), key, value]);
 
-const csv = result.map(columns => columns.join(", ")).join("\n");
+// const csv = result.map(columns => columns.join(", ")).join("\n");
 
-// with bom
-writeFileSync(
-  "./result.csv",
-  `\uFEFF${headers.join(", ")}\n${csv}\n\n,,,總和, ${sum}`
-);
+// // with bom
+// writeFileSync(
+//   "./result.csv",
+//   `\uFEFF${headers.join(", ")}\n${csv}\n\n,,,總和, ${sum}`
+// );
 
 writeFileSync(
   "./result.html",
   pug.compileFile("./result.pug")({
     headers,
     result,
-    sum
+    sum,
   })
 );
