@@ -4,6 +4,14 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "pug": "^2.0.4"
+    "lodash": "^4.17.15",
+    "pug": "^2.0.4",
+    "puppeteer": "^3.0.2"
+  },
+  "scripts": {
+    "make": "yarn fetch && node index",
+    "fetch": "yarn fetch:comments && yarn fetch:assignments",
+    "fetch:comments": "node crawlers/fetchComments",
+    "fetch:assignments": "node crawlers/fetchAssignments"
   }
 }

@@ -1,0 +1,19 @@
+{
+  "targets": [
+    {
+      "name": "INTRO",
+      "url": "https://lighthouse.alphacamp.co/admin/ta_dashboard?program_id=39&status=no_need_to_reply"
+    },
+    {
+      "name": "F2-1",
+      "url": "https://lighthouse.alphacamp.co/admin/ta_dashboard?program_id=40&status=no_need_to_reply"
+    },
+    {
+      "name": "F2-3",
+      "url": "https://lighthouse.alphacamp.co/admin/ta_dashboard?program_id=42&status=no_need_to_reply"
+    }
+  ],
+  "begin": "2020/5/1",
+  "end": "2020/6/1",
+  "cohort": 67
+}
