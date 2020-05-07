@@ -8,11 +8,38 @@ const begin = new Date(config.begin).getTime();
 const end = new Date(config.end).getTime();
 const raw = readFileSync('./assignments.csv', { encoding: 'utf-8' });
 
+const parseLine = raw => {
+  const results = [];
+  let result = '';
+  let hasQuotation = false;
+
+  for (let i = 0; i < raw.length; i++) {
+    if (hasQuotation) {
+      if (raw[i] == '"') {
+        hasQuotation = false;
+      } else {
+        result += raw[i];
+      }
+    } else {
+      if (raw[i] == '"') {
+        hasQuotation = true;
+      } else if (raw[i] == ',') {
+        results.push(result);
+        result = '';
+      } else {
+        result += raw[i];
+      }
+    }
+  }
+
+  return results;
+};
+
 const urls = raw
   .split('\n')
   .filter(line => line.includes('政治'))
   .map(line => {
-    const columns = line.split(',');
+    const columns = parseLine(line);
     const cohort = parseInt(columns[0]);
     const time = new Date(`${columns[2]} ${columns[3]}`).getTime();
     const url = columns[5];
