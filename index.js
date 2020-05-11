@@ -75,6 +75,7 @@ const results = [
     assignments,
   ),
   ...calc('F2-1', comments.find(({ name }) => name == 'F2-1').time, []),
+  ...calc('F2-3', comments.find(({ name }) => name == 'F2-3').time, []),
 ];
 
 writeFileSync(
