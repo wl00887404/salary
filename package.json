@@ -9,7 +9,8 @@
     "puppeteer": "^3.0.2"
   },
   "scripts": {
-    "make": "yarn fetch && node index",
+    "start": "yarn fetch && yarn start",
+    "make": "node index",
     "fetch": "yarn fetch:comments && yarn fetch:assignments",
     "fetch:comments": "node crawlers/fetchComments",
     "fetch:assignments": "node crawlers/fetchAssignments"

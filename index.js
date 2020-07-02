@@ -76,7 +76,7 @@ const results = [
   ),
   ...calc('F2-1', comments.find(({ name }) => name == 'F2-1').time, []),
   ...calc('F2-3', comments.find(({ name }) => name == 'F2-3').time, []),
-];
+].sort((a, b) => new Date(a[3]).getTime() - new Date(b[3]).getTime());
 
 writeFileSync(
   './result.html',
