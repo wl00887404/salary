@@ -1,53 +1,49 @@
-const { readFileSync, writeFileSync } = require('fs');
-const { flattenDeep } = require('lodash');
+const { writeFileSync } = require('fs');
+const { flattenDeep, last } = require('lodash');
 
 const login = require('./login');
 const config = require('../config.json');
+const extraURLs = require('../extraAssignmentURLs.json');
 
 const begin = new Date(config.begin).getTime();
 const end = new Date(config.end).getTime();
-const raw = readFileSync('./assignments.csv', { encoding: 'utf-8' });
 
-const parseLine = raw => {
+const fetchUrls = async browser => {
+  const page = await browser.newPage();
   const results = [];
-  let result = '';
-  let hasQuotation = false;
 
-  for (let i = 0; i < raw.length; i++) {
-    if (hasQuotation) {
-      if (raw[i] == '"') {
-        hasQuotation = false;
-      } else {
-        result += raw[i];
-      }
-    } else {
-      if (raw[i] == '"') {
-        hasQuotation = true;
-      } else if (raw[i] == ',') {
-        results.push(result);
-        result = '';
-      } else {
-        result += raw[i];
-      }
-    }
+  await page.goto(
+    'https://lighthouse.alphacamp.co/console/answer_lists?program_id=39&status=replied',
+  );
+
+  while (true) {
+    const data = await page.$$eval('tr[id^="answer"]', trs =>
+      trs.map(tr => {
+        const time = new Date(
+          tr.querySelector('td:nth-child(2)').innerText,
+        ).getTime();
+        const url = tr.querySelector('td:nth-child(3) a').href;
+
+        return { url, time };
+      }),
+    );
+
+    results.push(
+      data
+        .filter(({ time }) => begin <= time && time < end)
+        .map(({ url }) => url),
+    );
+
+    const nextButton = await page.$('a[rel="next"]');
+
+    if (!nextButton || last(data).time < begin) break;
+
+    nextButton.click();
+    await page.waitForNavigation({ waitUntil: 'domcontentloaded' });
   }
 
-  return results;
+  return [...results, ...extraURLs];
 };
-
-const urls = raw
-  .split('\n')
-  .filter(line => line.includes('政治'))
-  .map(line => {
-    const columns = parseLine(line);
-    const cohort = parseInt(columns[0]);
-    const time = new Date(`${columns[2]} ${columns[3]}`).getTime();
-    const url = columns[5];
-
-    return { cohort, time, url };
-  })
-  .filter(({ cohort }) => cohort == config.cohort)
-  .map(({ url }) => url);
 
 const fetch = async (browser, url) => {
   const page = await browser.newPage();
@@ -70,12 +66,15 @@ const stringify = value => JSON.stringify(value, null, 2);
 
 const main = async () => {
   const browser = await login();
-  const results = await Promise.all(urls.map(url => fetch(browser, url)));
+  const urls = flattenDeep(await fetchUrls(browser));
+  const results = flattenDeep(
+    await Promise.all(urls.map(url => fetch(browser, url))),
+  );
 
   writeFileSync(
     './assignments.json',
     stringify(
-      flattenDeep(results)
+      results
         .filter(
           ({ name, time }) => name == '政治' && begin <= time && time < end,
         )

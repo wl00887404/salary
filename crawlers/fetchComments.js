@@ -1,5 +1,5 @@
 const { writeFileSync } = require('fs');
-const { zip } = require('lodash');
+const { zip, last } = require('lodash');
 const login = require('./login');
 
 const config = require('../config.json');
@@ -34,7 +34,7 @@ const fetch = async (browser, url) => {
 
     const nextButton = await page.$('a[rel="next"]');
 
-    if (!nextButton || data[data.length - 1].time < begin) break;
+    if (!nextButton || last(data).time < begin) break;
 
     nextButton.click();
     await page.waitForNavigation({ waitUntil: 'domcontentloaded' });

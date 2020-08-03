@@ -2,18 +2,18 @@
   "targets": [
     {
       "name": "INTRO",
-      "url": "https://lighthouse.alphacamp.co/admin/ta_dashboard?program_id=39&status=no_need_to_reply"
+      "url": "https://lighthouse.alphacamp.co/console/ta_dashboard?program_id=39&status=no_need_to_reply"
     },
     {
       "name": "F2-1",
-      "url": "https://lighthouse.alphacamp.co/admin/ta_dashboard?program_id=40&status=no_need_to_reply"
+      "url": "https://lighthouse.alphacamp.co/console/ta_dashboard?program_id=40&status=no_need_to_reply"
     },
     {
       "name": "F2-3",
-      "url": "https://lighthouse.alphacamp.co/admin/ta_dashboard?program_id=42&status=no_need_to_reply"
+      "url": "https://lighthouse.alphacamp.co/console/ta_dashboard?program_id=42&status=no_need_to_reply"
     }
   ],
-  "begin": "2020/6/1",
-  "end": "2020/7/1",
-  "cohort": 70
+  "begin": "2020/7/1",
+  "end": "2020/8/1",
+  "__comment__": "begin is included, end is excluded."
 }
