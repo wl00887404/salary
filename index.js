@@ -21,7 +21,7 @@ const toString = time => {
 };
 
 const calc = (name, comments, assignments) => {
-  const hoursPerComment = 1 / 4;
+  const hoursPerComment = 1 / 5;
   const hoursPerAssignment = 1 / 10;
 
   comments = comments.map(toString);
