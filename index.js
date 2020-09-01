@@ -70,7 +70,7 @@ const headers = [
 
 const results = [
   ...calc(
-    'Intro',
+    'INTRO',
     comments.find(({ name }) => name == 'INTRO').time,
     assignments,
   ),
