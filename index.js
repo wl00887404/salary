@@ -1,4 +1,5 @@
 const { writeFileSync } = require('fs');
+const { exec } = require('child_process');
 const { last, sum } = require('lodash');
 const pug = require('pug');
 
@@ -86,3 +87,6 @@ writeFileSync(
     sum: sum(results.map(last)),
   }),
 );
+
+exec('sensible-browser ./result.html');
+process.exit();
