@@ -9,8 +9,8 @@ const assignments = require('./assignments.json');
 const makeEvent = (commentSet, assignmentSet, key) => {
   const events = [];
 
-  if (commentSet.has(key)) events.push('回復問題');
-  if (assignmentSet.has(key)) events.push('回復作業問題');
+  if (commentSet.has(key)) events.push('回覆問題');
+  if (assignmentSet.has(key)) events.push('回覆作業問題');
 
   return events.join(' / ');
 };

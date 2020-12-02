@@ -17,18 +17,20 @@ const fetch = async (browser, url) => {
   while (true) {
     const data = await page.$$eval('tr[id^="comment"]', trs =>
       trs.map(tr => {
-        const id = tr.querySelector('td:nth-child(1) a').innerText;
+        const name = tr.querySelector('td:nth-child(1) a').innerText;
         const time = new Date(
           tr.querySelector('td:nth-child(7)').innerText,
         ).getTime();
 
-        return { id, time };
+        return { name, time };
       }),
     );
 
     results.push(
       ...data
-        .filter(({ id, time }) => id == '政治' && begin <= time && time < end)
+        .filter(
+          ({ name, time }) => name == '政治' && begin <= time && time < end,
+        )
         .map(({ time }) => new Date(time).toISOString()),
     );
 

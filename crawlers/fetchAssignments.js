@@ -1,37 +1,38 @@
 const { writeFileSync } = require('fs');
-const { flattenDeep, last } = require('lodash');
+const { last } = require('lodash');
 
 const login = require('./login');
 const config = require('../config.json');
-const extraURLs = require('../extraAssignmentURLs.json');
 
 const begin = new Date(config.begin).getTime();
 const end = new Date(config.end).getTime();
+const url =
+  'https://lighthouse.alphacamp.co/console/answer_lists/answer_comments?program_id=39&status=replied';
 
-const fetchUrls = async browser => {
+const fetch = async browser => {
   const page = await browser.newPage();
   const results = [];
 
-  await page.goto(
-    'https://lighthouse.alphacamp.co/console/answer_lists?program_id=39&status=replied',
-  );
+  await page.goto(url);
 
   while (true) {
-    const data = await page.$$eval('tr[id^="answer"]', trs =>
+    const data = await page.$$eval('tbody tr:not(:first-child)', trs =>
       trs.map(tr => {
+        const name = tr.querySelector('td:nth-child(1) p').innerText;
         const time = new Date(
           tr.querySelector('td:nth-child(2)').innerText,
         ).getTime();
-        const url = tr.querySelector('td:nth-child(3) a').href;
 
-        return { url, time };
+        return { name, time };
       }),
     );
 
     results.push(
-      data
-        .filter(({ time }) => begin <= time && time < end)
-        .map(({ url }) => url),
+      ...data
+        .filter(
+          ({ name, time }) => name == '政治' && begin <= time && time < end,
+        )
+        .map(({ time }) => new Date(time).toISOString()),
     );
 
     const nextButton = await page.$('a[rel="next"]');
@@ -42,23 +43,6 @@ const fetchUrls = async browser => {
     await page.waitForNavigation({ waitUntil: 'domcontentloaded' });
   }
 
-  return [...results, ...extraURLs];
-};
-
-const fetch = async (browser, url) => {
-  const page = await browser.newPage();
-
-  await page.goto(url);
-
-  const results = await page.$$eval('li[id^="comment"]', lis =>
-    lis.map(li => {
-      const name = li.querySelector('.name a').innerHTML;
-      const time = new Date(li.querySelector('.time a').innerHTML).getTime();
-
-      return { name, time };
-    }),
-  );
-
   return results;
 };
 
@@ -66,21 +50,9 @@ const stringify = value => JSON.stringify(value, null, 2);
 
 const main = async () => {
   const browser = await login();
-  const urls = flattenDeep(await fetchUrls(browser));
-  const results = flattenDeep(
-    await Promise.all(urls.map(url => fetch(browser, url))),
-  );
+  const results = await fetch(browser);
 
-  writeFileSync(
-    './assignments.json',
-    stringify(
-      results
-        .filter(
-          ({ name, time }) => name == '政治' && begin <= time && time < end,
-        )
-        .map(({ time }) => new Date(time).toISOString()),
-    ),
-  );
+  writeFileSync('./assignments.json', stringify(results));
 
   browser.close();
 };
