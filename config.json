@@ -21,7 +21,7 @@
       "url": "https://lighthouse.alphacamp.co/console/ta_dashboard?program_id=45&status=no_need_to_reply"
     }
   ],
-  "begin": "2020/11/1",
-  "end": "2020/12/1",
+  "begin": "2020/12/1",
+  "end": "2021/1/1",
   "__comment__": "begin is included, end is excluded."
 }

@@ -1,10 +1,10 @@
 const { writeFileSync } = require('fs');
 const { zip, last } = require('lodash');
+
 const login = require('./login');
-
 const config = require('../config.json');
-
 const { targets } = config;
+
 const begin = new Date(config.begin).getTime();
 const end = new Date(config.end).getTime();
 
