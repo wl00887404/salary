@@ -18,7 +18,7 @@ const makeEvent = (commentSet, assignmentSet, key) => {
 const toString = time => {
   const date = new Date(time);
 
-  return `2020-${date.getMonth() + 1}-${date.getDate()}`;
+  return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
 };
 
 const calc = (name, comments, assignments) => {
