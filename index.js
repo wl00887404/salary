@@ -3,8 +3,8 @@ const { exec } = require('child_process');
 const { last, sum } = require('lodash');
 const pug = require('pug');
 
-const config = require('./config');
-const comments = require('./comments.json');
+const { programs } = require('./config');
+const commentsByProgram = require('./commentsByProgram.json');
 const assignments = require('./assignments.json');
 
 const makeEvent = (commentSet, assignmentSet, key) => {
@@ -70,14 +70,10 @@ const headers = [
   '時數(最小單位：0.25 小時)',
 ];
 
-const results = config.targets
-  .map(target => target.name)
+const results = programs
+  .map(program => program.name)
   .map(name =>
-    calc(
-      name,
-      comments.find(comment => comment.name === name).time,
-      name === 'INTRO' ? assignments : [],
-    ),
+    calc(name, commentsByProgram[name], name === 'INTRO' ? assignments : []),
   )
   .flat()
   .sort((a, b) => new Date(a[3]).getTime() - new Date(b[3]).getTime());

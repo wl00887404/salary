@@ -1,9 +1,9 @@
 const { writeFileSync } = require('fs');
-const { zip, last } = require('lodash');
+const { zip, last, fromPairs } = require('lodash');
 
 const login = require('./login');
 const config = require('../config.json');
-const { targets } = config;
+const { programs } = config;
 
 const begin = new Date(config.begin).getTime();
 const end = new Date(config.end).getTime();
@@ -49,17 +49,18 @@ const stringify = value => JSON.stringify(value, null, 2);
 
 const main = async () => {
   const browser = await login();
-  const times = await Promise.all(
-    targets.map(target => fetch(browser, target.url)),
+  const result = await Promise.all(
+    programs.map(program => fetch(browser, program.url)),
   );
-
   writeFileSync(
-    './comments.json',
+    './commentsByProgram.json',
     stringify(
-      zip(targets, times).map(([target, time]) => ({
-        name: target.name,
-        time,
-      })),
+      fromPairs(
+        zip(programs, result).map(([program, comments]) => [
+          program.name,
+          comments,
+        ]),
+      ),
     ),
   );
 
