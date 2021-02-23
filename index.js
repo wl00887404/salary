@@ -3,6 +3,7 @@ const { exec } = require('child_process');
 const { last, sum } = require('lodash');
 const pug = require('pug');
 
+const config = require('./config');
 const comments = require('./comments.json');
 const assignments = require('./assignments.json');
 
@@ -69,15 +70,17 @@ const headers = [
   '時數(最小單位：0.25 小時)',
 ];
 
-const results = [
-  ...calc(
-    'INTRO',
-    comments.find(({ name }) => name == 'INTRO').time,
-    assignments,
-  ),
-  ...calc('F2-1', comments.find(({ name }) => name == 'F2-1').time, []),
-  ...calc('F2-3', comments.find(({ name }) => name == 'F2-3').time, []),
-].sort((a, b) => new Date(a[3]).getTime() - new Date(b[3]).getTime());
+const results = config.targets
+  .map(target => target.name)
+  .map(name =>
+    calc(
+      name,
+      comments.find(comment => comment.name === name).time,
+      name === 'INTRO' ? assignments : [],
+    ),
+  )
+  .flat()
+  .sort((a, b) => new Date(a[3]).getTime() - new Date(b[3]).getTime());
 
 writeFileSync(
   './result.html',
