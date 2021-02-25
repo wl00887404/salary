@@ -7,16 +7,21 @@ const { programs } = require('./config');
 const commentsByProgram = require('./commentsByProgram.json');
 const assignments = require('./assignments.json');
 
-const makeEvent = (commentSet, assignmentSet, key) => {
-  const events = [];
+const makeEventFactory = (commentDates, assignmentDates) => {
+  const distinctCommentDates = new Set(commentDates);
+  const distinctAssignmentDates = new Set(assignmentDates);
 
-  if (commentSet.has(key)) events.push('回覆問題');
-  if (assignmentSet.has(key)) events.push('回覆作業問題');
+  return key => {
+    const events = [];
 
-  return events.join(' / ');
+    if (distinctCommentDates.has(key)) events.push('回覆問題');
+    if (distinctAssignmentDates.has(key)) events.push('回覆作業問題');
+
+    return events.join(' / ');
+  };
 };
 
-const toString = time => {
+const toDateString = time => {
   const date = new Date(time);
 
   return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
@@ -26,39 +31,41 @@ const calc = (name, comments, assignments) => {
   const hoursPerComment = 1 / 5;
   const hoursPerAssignment = 1 / 10;
 
-  comments = comments.map(toString);
-  assignments = assignments.map(toString);
+  // 只留下日期
+  commentDates = comments.map(toDateString);
+  assignmentDates = assignments.map(toDateString);
 
-  const commentSet = new Set(comments);
-  const assignmentSet = new Set(assignments);
-  const resultMap = new Map();
+  const result = new Map();
+  const makeEvent = makeEventFactory(commentDates, assignmentDates);
 
-  comments.forEach(comment => {
-    const value = resultMap.get(comment) || 0;
+  commentDates.forEach(date => {
+    const cumulativeHours = result.get(date) || 0; // 當天已累積的時數
 
-    resultMap.set(comment, value + hoursPerComment);
+    result.set(date, cumulativeHours + hoursPerComment);
   });
 
-  assignments.map(toString).forEach(assignment => {
-    const value = resultMap.get(assignment) || 0;
+  assignmentDates.forEach(date => {
+    const cumulativeHours = result.get(date) || 0; // 當天已累積的時數
 
-    resultMap.set(assignment, value + hoursPerAssignment);
+    result.set(date, cumulativeHours + hoursPerAssignment);
   });
 
-  resultMap.forEach((value, key) => {
-    resultMap.set(key, Math.ceil(value / 0.25) * 0.25); // 不滿 0.25 取 0.25
+  // map 的 forEach key value 竟然是顛倒過來的
+  result.forEach((cumulativeHours, date) => {
+    result.set(date, Math.ceil(cumulativeHours / 0.25) * 0.25); // 不滿 0.25 取 0.25
   });
 
-  return Array.from(resultMap)
+  return Array.from(result)
     .sort(
-      ([key1], [key2]) => new Date(key1).getTime() - new Date(key2).getTime(),
+      ([date1], [date2]) =>
+        new Date(date1).getTime() - new Date(date2).getTime(),
     )
-    .map(([key, value]) => [
+    .map(([date, cumulativeHours]) => [
       '振志',
       name,
-      makeEvent(commentSet, assignmentSet, key),
-      key,
-      value,
+      makeEvent(date),
+      date,
+      cumulativeHours,
     ]);
 };
 
